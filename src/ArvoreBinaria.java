@@ -228,6 +228,18 @@ public class ArvoreBinaria<X extends Comparable<X>> implements Cloneable
         return (X) ret;
     }
 
+    public int getQtdDeNodos ()
+    {
+        return getQtdDeNodos(this.raiz);
+    }
+    private int getQtdDeNodos (No r)
+    {
+        if(r == null) return 0;
+        return 1 + getQtdDeNodos(r.getEsq()) + getQtdDeNodos(r.getDir());
+    }
+
+
+
     public X getMaior() throws Exception
     {
         if(this.raiz == null) throw new Exception("Arvore vazia");
@@ -251,77 +263,103 @@ public class ArvoreBinaria<X extends Comparable<X>> implements Cloneable
         return (X) ret;
     }
 
-    public void remova(X info) throws Exception {
+    public void remova(X info) throws Exception
+    {
         if (info == null) throw new Exception("Informação ausente");
 
-        No parent = null;
-        No current = raiz;
+        No pai = null;
+        No atual = raiz;
 
         // Encontrar o nó a ser removido e seu pai
-        while (current != null && !current.getInfo().equals(info)) {
-            parent = current;
-            if (info.compareTo(current.getInfo()) < 0) {
-                current = current.getEsq();
+        while (atual != null && !atual.getInfo().equals(info)) {
+            pai = atual;
+            if (info.compareTo(atual.getInfo()) < 0) {
+                atual = atual.getEsq();
             } else {
-                current = current.getDir();
+                atual = atual.getDir();
             }
         }
 
-        if (current == null) {
+        if (atual == null) {
             throw new Exception("Informação não encontrada");
         }
 
         // Caso 1: Nó é uma folha
-        if (current.getEsq() == null && current.getDir() == null) {
-            if (current == raiz) {
+        if (atual.getEsq() == null && atual.getDir() == null) {
+            if (atual == raiz) {
                 raiz = null;
-            } else if (current == parent.getEsq()) {
-                parent.setEsq(null);
+            } else if (atual == pai.getEsq()) {
+                pai.setEsq(null);
             } else {
-                parent.setDir(null);
+                pai.setDir(null);
             }
         }
         // Caso 2: Nó tem apenas filho à direita
-        else if (current.getEsq() == null) {
-            if (current == raiz) {
-                raiz = current.getDir();
-            } else if (current == parent.getEsq()) {
-                parent.setEsq(current.getDir());
+        else if (atual.getEsq() == null) {
+            if (atual == raiz) {
+                raiz = atual.getDir();
+            } else if (atual == pai.getEsq()) {
+                pai.setEsq(atual.getDir());
             } else {
-                parent.setDir(current.getDir());
+                pai.setDir(atual.getDir());
             }
         }
         // Caso 3: Nó tem apenas filho à esquerda
-        else if (current.getDir() == null) {
-            if (current == raiz) {
-                raiz = current.getEsq();
-            } else if (current == parent.getEsq()) {
-                parent.setEsq(current.getEsq());
+        else if (atual.getDir() == null) {
+            if (atual == raiz) {
+                raiz = atual.getEsq();
+            } else if (atual == pai.getEsq()) {
+                pai.setEsq(atual.getEsq());
             } else {
-                parent.setDir(current.getEsq());
+                pai.setDir(atual.getEsq());
             }
         }
         // Caso 4: Nó tem dois filhos
         else {
-            No successorParent = current;
-            No successor = current.getDir();
+            No successorPai = atual;
+            No successor = atual.getDir();
 
             // Encontrar o menor nó na subárvore direita (sucessor)
             while (successor.getEsq() != null) {
-                successorParent = successor;
+                successorPai = successor;
                 successor = successor.getEsq();
             }
 
             // Substituir o info do nó atual com o info do sucessor
-            current.setInfo(successor.getInfo());
+            atual.setInfo(successor.getInfo());
 
             // Remover o sucessor
-            if (successorParent != current) {
-                successorParent.setEsq(successor.getDir());
+            if (successorPai != atual) {
+                successorPai.setEsq(successor.getDir());
             } else {
-                successorParent.setDir(successor.getDir());
+                successorPai.setDir(successor.getDir());
             }
         }
+    }
+
+    public void balanceieSe ()
+    {
+        balanceieSe(this.raiz);
+    }
+    private void balanceieSe(No r)
+    {
+        // se quantidade da direita - esquerda for >1 ou <-1 faça
+        /*
+        * enquanto a quantidade de nós para a esquerda de r for 2 ou maior do que
+        * a quantidade de nós a direita de r, remova da esquerda a extrema direita,
+        * guardando numa variável o valor ali presente; substitua por esse valor
+        * o valor presente na raiz, salvando-o antes de outra variável; insira na
+        * arvore o valor que estava presente a raiz
+        * OBS chame apenas uam vez o getQtdDeNodos()
+        *
+        *  enquanto a quantidade de nós para a direita de r for 2 ou maior do que
+         * a quantidade de nós a esquerda de r, remova da direita a extrema esquerda,
+         * guardando numa variável o valor ali presente; substitua por esse valor
+         * o valor presente na raiz, salvando-o antes de outra variável; insira na
+         * arvore o valor que estava presente a raiz
+         *
+         * faça recursão para a esquerda e para a direita
+        * */
     }
 
 
