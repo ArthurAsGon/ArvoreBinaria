@@ -350,7 +350,8 @@ public class ArvoreBinaria<X extends Comparable<X>> implements Cloneable
         * guardando numa variável o valor ali presente; substitua por esse valor
         * o valor presente na raiz, salvando-o antes de outra variável; insira na
         * arvore o valor que estava presente a raiz
-        * OBS chame apenas uam vez o getQtdDeNodos()
+        * OBS chame apenas uam vez o getQtdDeNodos() para a esquerda e para a direita
+        *       armazenando os resultados em uma variável que voce atualiza no While
         *
         *  enquanto a quantidade de nós para a direita de r for 2 ou maior do que
          * a quantidade de nós a esquerda de r, remova da direita a extrema esquerda,
