@@ -286,8 +286,8 @@ public class ArvoreBinaria<X extends Comparable<X>> implements Cloneable
 
         // Caso 1: Nó é uma folha
         if (atual.getEsq() == null && atual.getDir() == null) {
-            if (atual == raiz) {
-                raiz = null;
+            if (atual == this.raiz) {
+                this.raiz = null;
             } else if (atual == pai.getEsq()) {
                 pai.setEsq(null);
             } else {
@@ -296,8 +296,8 @@ public class ArvoreBinaria<X extends Comparable<X>> implements Cloneable
         }
         // Caso 2: Nó tem apenas filho à direita
         else if (atual.getEsq() == null) {
-            if (atual == raiz) {
-                raiz = atual.getDir();
+            if (atual == this.raiz) {
+                this.raiz = atual.getDir();
             } else if (atual == pai.getEsq()) {
                 pai.setEsq(atual.getDir());
             } else {
@@ -306,8 +306,8 @@ public class ArvoreBinaria<X extends Comparable<X>> implements Cloneable
         }
         // Caso 3: Nó tem apenas filho à esquerda
         else if (atual.getDir() == null) {
-            if (atual == raiz) {
-                raiz = atual.getEsq();
+            if (atual == this.raiz) {
+                this.raiz = atual.getEsq();
             } else if (atual == pai.getEsq()) {
                 pai.setEsq(atual.getEsq());
             } else {
@@ -316,52 +316,109 @@ public class ArvoreBinaria<X extends Comparable<X>> implements Cloneable
         }
         // Caso 4: Nó tem dois filhos
         else {
-            No successorPai = atual;
-            No successor = atual.getDir();
-
-            // Encontrar o menor nó na subárvore direita (sucessor)
-            while (successor.getEsq() != null) {
-                successorPai = successor;
-                successor = successor.getEsq();
+            No sucessor = null;
+            if(getQtdDeNodos(atual.getDir()) < getQtdDeNodos(atual.getEsq()))
+            {
+                pai = atual;
+                sucessor = atual.getEsq();
+                while (sucessor.getDir() != null)
+                {
+                    pai = sucessor;
+                    sucessor = sucessor.getDir();
+                }
+                pai.setDir(sucessor.getEsq());
             }
-
-            // Substituir o info do nó atual com o info do sucessor
-            atual.setInfo(successor.getInfo());
-
-            // Remover o sucessor
-            if (successorPai != atual) {
-                successorPai.setEsq(successor.getDir());
-            } else {
-                successorPai.setDir(successor.getDir());
+            else {
+                pai =atual;
+                sucessor = atual.getDir();
+                while (sucessor.getEsq() != null){
+                    pai = sucessor;
+                    sucessor = sucessor.getEsq();
+                }
+                pai.setEsq(sucessor.getDir());
             }
+            atual.setInfo(sucessor.getInfo());
         }
     }
 
-    public void balanceieSe ()
-    {
+    public void balanceieSe () throws Exception {
         balanceieSe(this.raiz);
     }
-    private void balanceieSe(No r)
-    {
-        // se quantidade da direita - esquerda for >1 ou <-1 faça
-        /*
-        * enquanto a quantidade de nós para a esquerda de r for 2 ou maior do que
-        * a quantidade de nós a direita de r, remova da esquerda a extrema direita,
-        * guardando numa variável o valor ali presente; substitua por esse valor
-        * o valor presente na raiz, salvando-o antes de outra variável; insira na
-        * arvore o valor que estava presente a raiz
-        * OBS chame apenas uam vez o getQtdDeNodos() para a esquerda e para a direita
-        *       armazenando os resultados em uma variável que voce atualiza no While
-        *
-        *  enquanto a quantidade de nós para a direita de r for 2 ou maior do que
-         * a quantidade de nós a esquerda de r, remova da direita a extrema esquerda,
-         * guardando numa variável o valor ali presente; substitua por esse valor
-         * o valor presente na raiz, salvando-o antes de outra variável; insira na
-         * arvore o valor que estava presente a raiz
-         *
-         * faça recursão para a esquerda e para a direita
-        * */
+    private void balanceieSe(No r) throws Exception {
+        if(r ==null)return;
+        // enquanto a quantidade de nós a esquerda menos
+        // a quantidade de nós a direita for maior 1,
+        // remova da esquerda a extrema direita, guardando
+        // numa variável o valor ali presente; substitua por
+        // esse valor o valor presente na raiz, salvando-o
+        // antes numa outra variavel; insira na arvore o valor
+        // que estava presente na raiz
+        // OBS: CHAME 1 SÓ VEZ getQtdDeNodos PARA A ESQUERDA E
+        //      PARA A DIREITA, ARMAZENANDO OS RESULTADOS EM
+        //      VARIÁVEIS QUE VOCÊ ATUALIZA NO WHILE
+        int qtdDireita = getQtdDeNodos(r.getDir());
+        int qtdEsquerda = getQtdDeNodos(r.getEsq());
+        No antigaRaiz = r;
+
+        X valorExtremo = null;
+
+        while (Math.abs(qtdEsquerda-qtdDireita) > 1)
+        {
+            if(qtdEsquerda > qtdDireita +1)
+            {
+                X antigaRaizInfo = r.getInfo();
+                No atual = r;
+                while (atual.getDir()!= null)
+                {
+                    atual = atual.getDir();
+                }
+                r.setInfo(atual.getInfo());
+                remova(atual.getInfo());
+                inclua(antigaRaizInfo);
+                qtdEsquerda--;
+                qtdDireita++;
+            }
+            else {
+                X antigaRaizInfo = r.getInfo();
+                No atual = r;
+                while (atual.getEsq() != null)
+                {
+                    atual = atual.getEsq();
+                }
+                r.setInfo(atual.getInfo());
+                remova(atual.getInfo());
+                inclua(antigaRaizInfo);
+                qtdDireita--;
+                qtdEsquerda++;
+
+
+            }
+        }
+
+
+
+        // enquanto a quantidade de nós a direita menos
+        // a quantidade de nós a esquerda for maior 1,
+        // remova da direita a extrema esquerda, guardando
+        // numa variável o valor ali presente; substitua por
+        // esse valor o valor presente na raiz, salvando-o
+        // antes numa outra variavel; insira na arvore o valor
+        // que estava presente na raiz
+        // OBS: CHAME 1 SÓ VEZ getQtdDeNodos PARA A ESQUERDA E
+        //      PARA A DIREITA, ARMAZENANDO OS RESULTADOS EM
+        //      VARIÁVEIS QUE VOCÊ ATUALIZA NO WHILE
+
+
+
+        // faça recursão para a esquerda e para a direita
+
+
+
+
+
+
     }
+
 
 
 
